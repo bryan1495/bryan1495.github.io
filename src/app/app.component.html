@@ -1,1 +1,2 @@
-<board [tick]="(tickSource | async)!"></board>
+<board [tick]="(tickSource | async)!" (updateScore)="score = $event"></board>
+<h3>Score: {{score}}</h3>

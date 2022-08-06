@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { StaticData } from '../shared/static-data';
 
 @Component({
@@ -20,6 +20,7 @@ export class BoardComponent implements AfterViewInit {
   get tick(): number{
     return this._tick;
   }
+  @Output() updateScore: EventEmitter<number> = new EventEmitter();
 
   set died(reason: string){
     if(!this._dead){
@@ -58,6 +59,7 @@ export class BoardComponent implements AfterViewInit {
     if(Math.abs(snake.x - this._food.x) <= 10 && Math.abs(snake.y - this._food.y) <= 10){ // Eaten food!
       console.log('Collision!! Snake at', snake, 'And food at', this._food)
       this.score++;
+      this.updateScore.emit(this.score);
 
       this.generateFood();
     }

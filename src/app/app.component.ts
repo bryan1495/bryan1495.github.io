@@ -8,6 +8,7 @@ import { filter, interval, Observable } from 'rxjs';
 })
 export class AppComponent {
   public tickSource!: Observable<number>;
+  public score: number = 0;
   private _isPaused: boolean = false;
 
   constructor(){
