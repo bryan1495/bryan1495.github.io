@@ -18,6 +18,7 @@ export class SnakeComponent {
   }
 
   @Output() snakeCoords: EventEmitter<{x: number, y: number}> = new EventEmitter();
+  @Output() died: EventEmitter<string> = new EventEmitter();
 
   private _x: number = StaticData.boardConstants.width / 2;
   private _y: number = StaticData.boardConstants.height / 2;
@@ -32,23 +33,31 @@ export class SnakeComponent {
   onKeyPress(event: KeyboardEvent) { 
     switch(event.key){
       case 'ArrowUp': {
-        this._direction = Direction.Up;
-        this._segments.length && this._dirChangedAt.push({x: this._x, y: this._y, newDirection: Direction.Up, visited: 0});
+        if(this._direction != Direction.Down){
+          this._direction = Direction.Up;
+          this._segments.length && this._dirChangedAt.push({x: this._x, y: this._y, newDirection: Direction.Up, visited: 0});
+        }
         break;
       }
       case 'ArrowDown': {
-        this._direction = Direction.Down;
-        this._segments.length && this._dirChangedAt.push({x: this._x, y: this._y, newDirection: Direction.Down, visited: 0});
+        if(this._direction != Direction.Up){
+          this._direction = Direction.Down;
+          this._segments.length && this._dirChangedAt.push({x: this._x, y: this._y, newDirection: Direction.Down, visited: 0});
+        }
         break;
       }
       case 'ArrowLeft': {
-        this._direction = Direction.Left;
-        this._segments.length && this._dirChangedAt.push({x: this._x, y: this._y, newDirection: Direction.Left, visited: 0});
+        if(this._direction != Direction.Right){
+          this._direction = Direction.Left;
+          this._segments.length && this._dirChangedAt.push({x: this._x, y: this._y, newDirection: Direction.Left, visited: 0});
+        }
         break;
       }
       case 'ArrowRight': {
-        this._direction = Direction.Right;
-        this._segments.length && this._dirChangedAt.push({x: this._x, y: this._y, newDirection: Direction.Right, visited: 0});
+        if(this._direction != Direction.Left){
+          this._direction = Direction.Right;
+          this._segments.length && this._dirChangedAt.push({x: this._x, y: this._y, newDirection: Direction.Right, visited: 0});
+        }
         break;
       }
       case ' ': {
@@ -103,6 +112,10 @@ export class SnakeComponent {
       }
     }
     this.snakeCoords.emit({x: this._x - (StaticData.snakeConstants.segmentSize / 2), y: this._y - (StaticData.snakeConstants.segmentSize / 2)});
+    let eatenSelf = this._segments.some(segment => Math.abs(this._x - segment.x) <= StaticData.snakeConstants.segmentSize && Math.abs(this._y - segment.y) <= StaticData.snakeConstants.segmentSize);
+
+    if(eatenSelf)
+      this.died.emit('got too hungry!');
 
     this._segments.forEach((segment, index) => {
       switch(segment.direction){

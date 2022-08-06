@@ -20,6 +20,14 @@ export class BoardComponent implements AfterViewInit {
   get tick(): number{
     return this._tick;
   }
+
+  set died(reason: string){
+    if(!this._dead){
+      this._dead = true;
+      alert(`You died because you ${reason} \nScore: ${this.score}`);
+      window.location.reload();
+    }
+  }
   @ViewChild('board', {static: false}) private _boardRef!: ElementRef<HTMLCanvasElement>;
 
   public context!: CanvasRenderingContext2D;
@@ -54,13 +62,11 @@ export class BoardComponent implements AfterViewInit {
       this.generateFood();
     }
 
-    if(!this._dead && (snake.x >= StaticData.boardConstants.width - StaticData.snakeConstants.segmentSize
+    if((snake.x >= StaticData.boardConstants.width - StaticData.snakeConstants.segmentSize
       || snake.x <= (StaticData.snakeConstants.segmentSize / 2)
       || snake.y >= StaticData.boardConstants.height - StaticData.snakeConstants.segmentSize
       || snake.y <= (StaticData.snakeConstants.segmentSize / 2))){
-        this._dead = true;
-        alert('you died');
-        window.location.reload();
+        this.died = 'bumped into the wall!';
     }
   }
 }
