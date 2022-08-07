@@ -1,5 +1,5 @@
 import { Component, HostListener } from '@angular/core';
-import { filter, interval, Observable } from 'rxjs';
+import { BehaviorSubject, filter, interval, Observable, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -7,12 +7,24 @@ import { filter, interval, Observable } from 'rxjs';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  public tickSource!: Observable<number>;
-  public score: number = 0;
   private _isPaused: boolean = false;
+  private _score: number = 0;
+  private _tickSpeed: BehaviorSubject<number> = new BehaviorSubject(1);
+
+  set score(value: number){
+    this._score = value;
+    this._tickSpeed.next(value);
+  }
+  get score() {
+    return this._score;
+  }
+  public tickSource!: Observable<number>;
 
   constructor(){
-    this.tickSource = interval(1000/60).pipe(filter(_ => !this._isPaused));
+    this.tickSource = this._tickSpeed.pipe(
+      switchMap(speed => interval(1000/(60 + speed * 3))),
+      filter(_ => !this._isPaused)
+    );
   }
 
   @HostListener('document:keydown', ['$event'])
